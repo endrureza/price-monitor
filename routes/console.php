@@ -16,3 +16,27 @@ use Illuminate\Foundation\Inspiring;
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->describe('Display an inspiring quote');
+
+Artisan::command('updateprice', function () {
+    $products = \App\Product::with('histories')
+        ->where('last_updated', '<=', now())
+        ->get();
+
+    foreach ($products as $product) {
+
+        $client = new \Goutte\Client();
+        $crawler = $client->request('GET',$product->url_fetch);
+
+        $price = $crawler->filter('meta[property="product:price:amount"]')->attr('content');
+
+        $product->price = $price;
+        $product->last_updated = now();
+        $product->save();
+
+        $product->histories()->create([
+            'price' => $price,
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+    }
+})->describe('Update product price');
