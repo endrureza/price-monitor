@@ -1,0 +1,71 @@
+version: '3.7'
+
+networks: 
+  backend:
+    driver: bridge    
+
+services:
+
+  # PHP-FPM Service
+  php-fpm:
+    build: 
+      context: ./docker/php-fpm
+    # container_name: php-fpm
+    working_dir: /var/www
+    volumes: 
+      - ./:/var/www:cached
+    networks: 
+      - backend
+
+  # Nginx Service
+  nginx:
+    build:
+      context: ./docker/nginx
+    # container_name: nginx
+    working_dir: /var/www
+    volumes: 
+      - ./:/var/www
+      - ./docker/logs/nginx:/var/log/nginx
+      - ./docker/nginx/sites-available:/etc/nginx/sites-available
+    ports: 
+      - 80:80
+      - 443:443
+    networks: 
+      - backend
+
+  # MySQL Service
+  mysql:
+    build: 
+      context: ./docker/mysql
+    # container_name: mysql
+    volumes: 
+      - ./docker/mysql/data:/var/lib/mysql
+    ports: 
+      - 3306:3306
+    environment: 
+      - MYSQL_DATABASE=priceweb
+      - MYSQL_USER=priceweb
+      - MYSQL_PASSWORD=secret
+      - MYSQL_ROOT_PASSWORD=secret
+    networks: 
+      - backend
+
+  # # Laravel Horizon Service
+  # laravel-horizon:
+  #   build: 
+  #     context: ./docker/laravel-horizon
+  #   volumes: 
+  #     - ./:/var/www
+  #     - ./docker/laravel-horizon/supervisor.d:/etc/supervisor.d
+  #   networks: 
+  #     - backend
+
+  # # PHP-Worker Service
+  # php-worker:
+  #   build: 
+  #     context: ./docker/php-worker
+  #   volumes: 
+  #     - ./:/var/www
+  #     - ./docker/php-worker/supervisor.d:/etc/supervisor.d
+  #   networks: 
+  #     - backend
