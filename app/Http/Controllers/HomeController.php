@@ -6,6 +6,7 @@ use App\Product;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Goutte\Client;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Str;
 
 class HomeController extends Controller
@@ -53,7 +54,7 @@ class HomeController extends Controller
             'updated_at' => now()
         ]);
 
-        return redirect('/product/' . $slug);
+        return Redirect::route('show', $slug);
     }
 
     public function show(Request $request, string $slug)
