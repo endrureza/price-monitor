@@ -59,7 +59,7 @@ class HomeController extends Controller
 
     public function show(Request $request, string $slug)
     {
-        $product = Product::whereSlug($slug)->first();
+        $product = Product::with('histories')->whereSlug($slug)->first();
 
         return Inertia::render('Show', [
             'product' => $product,

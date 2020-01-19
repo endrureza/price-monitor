@@ -11,7 +11,7 @@ class Product extends Model
 
     protected $guarded = [];
 
-    public function history(): HasMany
+    public function histories(): HasMany
     {
         return $this->hasMany('\App\ProductPriceHistory', 'product_id');
     }
